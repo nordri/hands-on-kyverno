@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-versioned
+  namespace: production
+  labels:
+    security-level: restricted
+spec:
+  containers:
+    - name: nginx
+      image: registry.company.internal/nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-latest
+  namespace: production
+spec:
+  containers:
+    - name: nginx
+      image: registry.company.internal/nginx:latest

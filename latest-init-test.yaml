@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: latest-init-test
+  namespace: production
+spec:
+  initContainers:
+    - name: setup
+      image: registry.company.internal/busybox:latest
+      command: ["sh", "-c", "echo setup"]
+  containers:
+    - name: nginx
+      image: registry.company.internal/nginx:1.27

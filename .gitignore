@@ -1,0 +1,7 @@
+# Kyverno CLI
+/kyverno
+/kyverno.tar.gz
+
+# Local files
+*.log
+.DS_Store

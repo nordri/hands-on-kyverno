@@ -1,0 +1,31 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: allowed-registries
+spec:
+  matchConstraints:
+    namespaceSelector:
+      matchLabels:
+        security-level: restricted
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: >-
+        object.spec.containers.all(c,
+          c.image.startsWith("registry.company.internal/")
+        ) &&
+        (!has(object.spec.initContainers) ||
+          object.spec.initContainers.all(c,
+            c.image.startsWith("registry.company.internal/")
+          )
+        ) &&
+        (!has(object.spec.ephemeralContainers) ||
+          object.spec.ephemeralContainers.all(c,
+            c.image.startsWith("registry.company.internal/")
+          )
+        )
+      message: "All container images must come from registry.company.internal"
+  validationActions: [Deny]
