@@ -1,0 +1,29 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: disallow-latest
+spec:
+  matchConstraints:
+    namespaceSelector:
+      matchLabels:
+        security-level: restricted
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: >-
+        (
+          object.spec.containers +
+          (has(object.spec.initContainers) ? object.spec.initContainers : []) +
+          (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])
+        ).all(c,
+          !c.image.endsWith(":latest") &&
+          (
+            c.image.contains("@sha256:") ||
+            c.image.substring(c.image.lastIndexOf("/") + 1).contains(":")
+          )
+        )
+      message: "All container images must use an explicit non-latest tag or SHA256 digest"
+  validationActions: [Deny]
