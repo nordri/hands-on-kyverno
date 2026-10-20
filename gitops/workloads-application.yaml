@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno-workloads
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nordri/hands-on-kyverno.git
+    targetRevision: main
+    path: gitops/workloads
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: development
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
